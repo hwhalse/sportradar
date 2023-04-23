@@ -52,9 +52,9 @@ cron.schedule("* */1 * * *", () => {
   findGames(dateString)
 })
 
-async function makeChild (link: string) {
+async function makeChild (link: string, gameId: number, teams: any) {
   const child = childProcess.fork("child.ts")
-  child.send({url: link})
+  child.send({url: link, gameId: gameId, teams: teams})
   child.on("exit", (code: any) => {
     console.log('finished')
     console.log(code)
@@ -73,10 +73,25 @@ async function findGames (today: string) {
         continue
       } else {
         live.add(game.link)
-        makeChild(game.link)
+        makeChild(game.link, game.gamePk, game.teams)
       }
     }
   }
 }
+
+// import {TextDecoderStream} from 'node:stream/web';
+// import { fetch } from 'undici';
+
+// async function readStream () {
+//   const data = await fetch('https://statsapi.web.nhl.com/api/v1/game/2022030133/feed/live')
+//   const stream = data.body;
+//   const textStream = stream?.pipeThrough(new TextDecoderStream())
+//   if (textStream) {
+//     for await (const chunk of textStream) {
+//       console.log(chunk)
+//     }
+//   }
+// }
+// const arr = []
 
 findGames(new Date().toISOString().slice(0, 10))
