@@ -7,11 +7,12 @@ import { typeDefs } from "./schema/nhl";
 import cors from 'cors';
 import http from 'http';
 import cron from 'node-cron';
-import { EventEmitter } from 'events';
-import {json} from 'body-parser';
+import childProcess from 'child_process';
+import { json } from 'body-parser';
 import { resolvers } from "./resolvers/nhlResolver";
 import * as dotenv from 'dotenv';
 import axios from 'axios';
+
 dotenv.config();
 
 export const pool = new Pool({
@@ -40,30 +41,42 @@ async function startApolloServer () {
   }))
   
   await new Promise<void>((resolve: any) => httpServer.listen({ port: 4000 }, resolve));
-  console.log(`🚀 Server ready at http://localhost:4000`);
+  console.log(`Server ready at http://localhost:4000`);
 }
 
 startApolloServer()
 
-cron.schedule("*/1 * * * *", () => {
-  findGames()
+cron.schedule("* */1 * * *", () => {
+  const today = new Date()
+  const dateString = today.toISOString().slice(0, 10)
+  findGames(dateString)
 })
 
-async function findGames () {
-  const schedule = await axios.get('https://statsapi.web.nhl.com/api/v1/teams')
-  const games = []
-  const teams = schedule.data.teams
-  for (const team of teams) {
-    const game = await axios.get(`https://statsapi.web.nhl.com/api/v1/schedule?teamId=${team.id}`)
-    const info = game.data;
-    if (info.dates.length > 0) games.push(info.dates[0])
-  }
-  const streams = []
-  for (const game of games) {
-    if (game.games[0].status.abstractGameState === "Live") {
-      streams.push(game.games[0].link)
+async function makeChild (link: string) {
+  const child = childProcess.fork("child.ts")
+  child.send({url: link})
+  child.on("exit", (code: any) => {
+    console.log('finished')
+    console.log(code)
+  })
+}
+
+const live = new Set()
+
+async function findGames (today: string) {
+  console.log('todays date', today)
+  const todaysGames = await axios.get(`https://statsapi.web.nhl.com/api/v1/schedule?&startDate=${today}&endDate=${today}`)
+  const gamesTodayArray = todaysGames.data.dates[0].games;
+  for (const game of gamesTodayArray) {
+    if (game.status.codedGameState === "3") {
+      if (live.has(game.link)) {
+        continue
+      } else {
+        live.add(game.link)
+        makeChild(game.link)
+      }
     }
   }
-  console.log(games.length)
-  console.log(streams.length)
 }
+
+findGames(new Date().toISOString().slice(0, 10))
