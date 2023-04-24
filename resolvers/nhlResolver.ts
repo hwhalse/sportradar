@@ -1,5 +1,9 @@
+import { IGameStats } from "./resolverTypes"
+
 export const resolvers = {
     Query: {
-        stat: () => console.log('test')
+        getGameStats: async (parent: IGameStats, args: any, context: any): Promise<void | IGameStats[]> => {
+            
+        }
     }
 }
