@@ -13,13 +13,13 @@ import { resolvers } from "./resolvers/nhlResolver";
 import * as dotenv from 'dotenv';
 dotenv.config();
 import axios from 'axios';
-import { IScheduleHomeAndAwayTeams, ApolloContext } from './types';
+import { IScheduleHomeAndAwayTeams, ApolloContext } from './types/types';
 
 export const pool = new Pool({
   connectionString: process.env.PG_CONNECT_URI
 })
 
-async function startApolloServer () {
+export async function startApolloServer () {
   const app = express();
 
   const httpServer = http.createServer(app);
@@ -47,6 +47,7 @@ async function startApolloServer () {
 startApolloServer()
 
 cron.schedule("* * */1 * *", () => {
+  console.log('running cron job in main process')
   findGames()
 })
 

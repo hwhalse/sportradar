@@ -1,7 +1,7 @@
 import axios from "axios";
-import { Play } from "./types";
+import { Play } from "./types/types";
 import { Pool } from 'pg'
-import { PlayerInfo, TeamInfo, Msg, RosterData } from "./types";
+import { PlayerInfo, TeamInfo, Msg } from "./types/types";
 
 const pool = new Pool({
     connectionString: process.env.PG_CONNECT_URI
@@ -26,9 +26,12 @@ async function updatePlayersAndTeams (link: string) {
         const playerInfo: PlayerInfo = data.gameData.players[playerId];
         try {   
             const values = [playerInfo.id, playerInfo.fullName, playerInfo.primaryPosition.name, playerInfo.primaryNumber, playerInfo.currentTeam.id, playerInfo.currentAge]
-            console.log(values)
-            const info = await pool.query(`INSERT INTO players (id, name, position, number, team_id, age) values ($1, $2, $3, $4, $5, $6) ON CONFLICT (id) DO NOTHING RETURNING *`, values)
-            console.log(info.rows[0])
+            const queryString = `
+            INSERT INTO players (id, name, position, number, team_id, age) 
+            Values ($1, $2, $3, $4, $5, $6) 
+            ON CONFLICT (id) 
+            DO NOTHING`
+            await pool.query(queryString, values)
         } catch(err) {
             console.log(err)
         }
@@ -37,8 +40,12 @@ async function updatePlayersAndTeams (link: string) {
         const teamInfo: TeamInfo = data.gameData.teams[team];
         try {
             const values = [teamInfo.id, teamInfo.name];
-            console.log(values)
-            await pool.query(`INSERT INTO teams (id, name) VALUES ($1, $2) ON CONFLICT DO NOTHING RETURNING *`, values)
+            const queryString = `
+            INSERT INTO teams (id, name) 
+            VALUES ($1, $2) 
+            ON CONFLICT 
+            DO NOTHING`
+            await pool.query(queryString, values)
         } catch(err) {
             console.log(err)
         }
@@ -57,7 +64,7 @@ async function getLiveData (link: string, gameId: number) {
     if (numPlays > playCount) {
         const newPlays = plays.slice(playCount, numPlays)
         console.log('number of new plays since last update: ', newPlays.length)
-        enqueue(newPlays, response.players, homeTeam, awayTeam, gameId)
+        enqueue(newPlays, homeTeam, awayTeam, gameId)
         playCount = numPlays;
     }
     if (response.gameData.status.abstractGameState !== "Live" || count === 10) {
@@ -73,14 +80,14 @@ async function getLiveData (link: string, gameId: number) {
 
 const queue: Play[] = []
 
-async function enqueue (chunks: Play[], roster: RosterData, homeTeam: TeamInfo, awayTeam: TeamInfo, gameId: number) {
+async function enqueue (chunks: Play[], homeTeam: TeamInfo, awayTeam: TeamInfo, gameId: number) {
     for (const play of chunks) {
         queue.push(play)
     }
-    writePlaysToDb(roster, homeTeam, awayTeam, gameId)
+    writePlaysToDb(homeTeam, awayTeam, gameId)
 }
 
-async function writePlaysToDb (roster: RosterData, homeTeam: TeamInfo, awayTeam: TeamInfo, gameId: number) {
+async function writePlaysToDb (homeTeam: TeamInfo, awayTeam: TeamInfo, gameId: number) {
     while (queue.length > 0) {
         console.log('queue length', queue.length)
         let queryString;
@@ -91,7 +98,8 @@ async function writePlaysToDb (roster: RosterData, homeTeam: TeamInfo, awayTeam:
         if (playEvent === 'Hit') {
             const opponentTeamId = play!.team.id === homeTeam.id ? awayTeam.id : homeTeam.id
             const values = [play?.about.eventIdx, gameId, play!.players[0].player.id, 0, 0, 1, 0, 0, opponentTeamId]
-            queryString = `INSERT INTO game_stats 
+            queryString = `
+            INSERT INTO game_stats 
             (event_index, game_id, player_id, assists, goals, hits, points, penalty_minutes, opponent_team_id) 
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
             ON CONFLICT (game_id, player_id) 
@@ -105,7 +113,8 @@ async function writePlaysToDb (roster: RosterData, homeTeam: TeamInfo, awayTeam:
                     try {
                         const opponentTeamId = play!.team.id === homeTeam.id ? awayTeam.id : homeTeam.id
                         const values = [play?.about.eventIdx, gameId, playerInPlay.player.id, 0, 1, 0, 0, 0, opponentTeamId]
-                        const queryString = `INSERT INTO game_stats 
+                        const queryString = `
+                        INSERT INTO game_stats 
                         (event_index, game_id, player_id, assists, goals, hits, points, penalty_minutes, opponent_team_id) 
                         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
                         ON CONFLICT (game_id, player_id) 
@@ -120,7 +129,8 @@ async function writePlaysToDb (roster: RosterData, homeTeam: TeamInfo, awayTeam:
                     try {
                         const opponentTeamId = play!.team.id === homeTeam.id ? awayTeam.id : homeTeam.id
                         const values = [play?.about.eventIdx, gameId, playerInPlay.player.id, 1, 0, 0, 0, 0, opponentTeamId]
-                        const queryString = `INSERT INTO game_stats 
+                        const queryString = `
+                        INSERT INTO game_stats 
                         (event_index, game_id, player_id, assists, goals, hits, points, penalty_minutes, opponent_team_id) 
                         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
                         ON CONFLICT (game_id, player_id) 
@@ -136,7 +146,8 @@ async function writePlaysToDb (roster: RosterData, homeTeam: TeamInfo, awayTeam:
         } else if (playEvent === 'Penalty') {
             const opponentTeamId = play!.team.id === homeTeam.id ? awayTeam.id : homeTeam.id
             const values = [play?.about.eventIdx, gameId, play!.players[0].player.id, 0, 0, 0, 0, play!.result.penaltyMinutes, opponentTeamId]
-            const queryString = `INSERT INTO game_stats 
+            const queryString = `
+            INSERT INTO game_stats 
             (event_index, game_id, player_id, assists, goals, hits, points, penalty_minutes, opponent_team_id) 
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
             ON CONFLICT (game_id, player_id) 
@@ -151,16 +162,19 @@ async function writePlaysToDb (roster: RosterData, homeTeam: TeamInfo, awayTeam:
         }
         const newScore = [play?.about.goals.away, play?.about.goals.home]
         if (newScore[0] !== score[0] || newScore[1] !== score[1]) {
+            const today = new Date()
+            const date = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`
             score = newScore
-            const queryString = `INSERT INTO game_scores 
-            (game_id, away_id, home_id, away_score, home_score) 
-            VALUES ($1, $2, $3, $4, $5) 
+            const queryString = `
+            INSERT INTO game_scores 
+            (game_id, away_id, home_id, away_score, home_score, date) 
+            VALUES ($1, $2, $3, $4, $5, $6) 
             ON CONFLICT (game_id) 
             DO UPDATE SET 
             away_score = $4,
             home_score = $5
             WHERE game_scores.game_id = $1`;
-            const values = [gameId, awayTeam.id, homeTeam.id, score[0], score[1]]
+            const values = [gameId, awayTeam.id, homeTeam.id, score[0], score[1], date]
             console.log(values)
             await pool.query(queryString, values)
         }

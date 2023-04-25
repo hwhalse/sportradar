@@ -1,4 +1,4 @@
-import { IGameScores, IGameStats, IPlayer, ITeam } from "./resolverTypes"
+import { IGameScores, IGameStats, IPlayer, ITeam } from "../types/resolverTypes"
 import { QueryControllers } from "../controllers/queryControllers"
 
 export const resolvers = {
@@ -7,7 +7,13 @@ export const resolvers = {
             return QueryControllers.findStatsByGame(args)
         },
         getGameStatsByPlayerID: async (parent: IGameStats, args: any, context: any): Promise<void | IGameStats[]> => {
-            return QueryControllers.findStatsByPlayer(args)
+            return QueryControllers.findGameStatsByPlayerID(args)
+        },
+        getPlayerStatsByID: async (parent: IGameStats, args: any, context: any): Promise<void | IGameStats[]> => {
+            return QueryControllers.findPlayerStatsByID(args)
+        },
+        getPlayerStatsByName: async (parent: IGameStats, args: any, context: any): Promise<void | IGameStats[]> => {
+            return QueryControllers.findPlayerStatsByName(args)
         },
         getPlayerByID: async (parent: IPlayer, args: any, context: any): Promise<void | IPlayer> => {
             return QueryControllers.findPlayerByID(args)
@@ -23,6 +29,9 @@ export const resolvers = {
         },
         getScores: async (parent: IGameScores, args: any, context: any): Promise<void | IGameScores> => {
             return QueryControllers.findScoreByGameID(args)
+        },
+        getAllGames: async (parent: IGameScores, args: any, context: any): Promise<void | IGameScores[]> => {
+            return QueryControllers.findAllGames(args)
         },
     }
 }

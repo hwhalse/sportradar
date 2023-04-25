@@ -23,6 +23,9 @@ type GameScores {
     home_id: Int
     away_score: Int
     home_score: Int
+    date: String
+    away_name: String
+    home_name: String
 }
 
 type Player {
@@ -41,10 +44,13 @@ type Team {
 
 type Query {
     getGameStatsByGameID(game_id: ID): [GameStats]
-    getGameStatsByPlayerID(player_id: ID): [GameStats]
+    getGameStatsByPlayerID(game_id: ID, player_id: ID): [GameStats]
+    getPlayerStatsByID(player_id: ID): [GameStats]
+    getPlayerStatsByName(name: String): [GameStats]
     getPlayerByID(player_id: ID): Player
     getPlayerByName(player_name: String): Player
     getTeamByID(team_id: ID): Team
     getTeamByName(team_name: String): Team
     getScores(game_id: ID): GameScores
+    getAllGames: [GameScores]
 }`
