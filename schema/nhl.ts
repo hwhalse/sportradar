@@ -2,43 +2,49 @@ export const typeDefs = `
 #graphql
 
 type GameStats {
-    playerID: int
-    playerName: string
-    teamID: int
-    playerAge: int
-    playerNumber: string
-    playerPosition: number
-    assists: int
-    goals: int
-    hits: int
-    penaltyMinutes: int
-    opponentTeam: string
+    game_id: Int
+    player_id: Int
+    player_name: String
+    team_id: Int
+    team_name: String
+    player_age: Int
+    player_number: String
+    player_position: String
+    assists: Int
+    goals: Int
+    hits: Int
+    penalty_minutes: Int
+    opponent_team_id: String
 }
 
 type GameScores {
-    gameID: int
-    awayTeam: string
-    homeTeam: string
-    score: string
+    game_id: Int
+    away_id: Int
+    home_id: Int
+    away_score: Int
+    home_score: Int
 }
 
 type Player {
-    ID: int
-    name: string
-    team: string
-    age: int
-    number: int
-    position: int
+    id: Int
+    name: String
+    team_id: Int
+    age: Int
+    number: Int
+    position: String
 }
 
 type Team {
-    ID: int
-    name: string
+    id: Int
+    name: String
 }
 
 type Query {
-    getGameStats: [GameStats]
-    getGameScore: [GameScores]
-    getPlayers: [Players]
-    getTeams: [Teams]
+    getGameStatsByGameID(game_id: ID): [GameStats]
+    getGameStatsByPlayerID(player_id: ID): [GameStats]
+    getPlayerByID(player_id: ID): Player
+    getPlayerByName(player_name: String): Player
+    getTeamByID(team_id: ID): Team
+    getTeamByName(team_name: String): Team
+    getScores(game_id: ID): GameScores
 }`
