@@ -20,13 +20,13 @@ NOTE: Currently, the child processes are set to run 10 times at 10-second interv
 -Allow offseason (non-live) querying of game statistics
 
     Tech
--TypeScript /n
--Node.js/Express /n
--PostgreSQL /n
--GraphQL /n
--Apollo Server /n
--Jest /n
--Axios /n
+-TypeScript <br/>
+-Node.js/Express <br/>
+-PostgreSQL <br/>
+-GraphQL <br/>
+-Apollo Server <br/>
+-Jest <br/>
+-Axios <br/>
 
     Approach
 -Create Node server which calls a function every 10 seconds. The function sends a GET request to the schedule API, which has a list of games for that day.
