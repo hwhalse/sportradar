@@ -16,7 +16,7 @@ import { IScheduleHomeAndAwayTeams, ApolloContext } from './types/types';
 
 //node-pg connection pool
 const pool = new Pool({
-  connectionString: process.env.PG_CONNECT_URI
+  connectionString: 'postgres://qookhyrf:pZq5pcKkVE-00P7K6gID7gzeQKTufdoW@lallah.db.elephantsql.com/qookhyrf'
 })
 
 dotenv.config();

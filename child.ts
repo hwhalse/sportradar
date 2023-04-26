@@ -4,7 +4,7 @@ import { Pool } from 'pg'
 import { PlayerInfo, TeamInfo, Msg } from "./types/types";
 
 const pool = new Pool({
-    connectionString: process.env.PG_CONNECT_URI
+    connectionString: 'postgres://qookhyrf:pZq5pcKkVE-00P7K6gID7gzeQKTufdoW@lallah.db.elephantsql.com/qookhyrf'
 })
 
 //log child process id

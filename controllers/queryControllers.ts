@@ -4,7 +4,7 @@ dotenv.config()
 import { Pool } from "pg";
 
 const pool = new Pool({
-    connectionString: process.env.PG_CONNECT_URI
+    connectionString: 'postgres://qookhyrf:pZq5pcKkVE-00P7K6gID7gzeQKTufdoW@lallah.db.elephantsql.com/qookhyrf'
 })
 
 export const QueryControllers = {
