@@ -1,25 +1,27 @@
 import express from 'express';
+import * as dotenv from 'dotenv';
+import cors from 'cors';
+import http from 'http';
+import childProcess from 'child_process';
+import axios from 'axios';
+import { json } from 'body-parser';
 import { Pool } from 'pg';
+//apollo imports
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 import { typeDefs } from "./schema/nhl";
-import cors from 'cors';
-import http from 'http';
-import cron from 'node-cron';
-import childProcess from 'child_process';
-import { json } from 'body-parser';
 import { resolvers } from "./resolvers/nhlResolver";
-import * as dotenv from 'dotenv';
-dotenv.config();
-import axios from 'axios';
 import { IScheduleHomeAndAwayTeams, ApolloContext } from './types/types';
 
-export const pool = new Pool({
+//node-pg connection pool
+const pool = new Pool({
   connectionString: process.env.PG_CONNECT_URI
 })
 
-export async function startApolloServer () {
+dotenv.config();
+
+async function startApolloServer () {
   const app = express();
 
   const httpServer = http.createServer(app);
@@ -39,17 +41,13 @@ export async function startApolloServer () {
     await new Promise<void>((resolve) => httpServer.listen({ port: 4000 }, resolve));
     console.log(`Server ready at http://localhost:4000`);
   } catch(err) {
-    console.log(err)
+    console.log('error starting apollo server with express: ', err)
   }
+  //make initial call to find live games today
   findGames()
 }
 
 startApolloServer()
-
-cron.schedule("* * */1 * *", () => {
-  console.log('running cron job in main process')
-  findGames()
-})
 
 async function makeChild (link: string, gameId: number, teams: IScheduleHomeAndAwayTeams) {
   const child = childProcess.fork("child.ts")
@@ -63,10 +61,12 @@ async function makeChild (link: string, gameId: number, teams: IScheduleHomeAndA
   })
 }
 
+//set of unique game links to prevent new processes for existing games
 const live = new Set()
 
 async function findGames () {
   const todaysGames = await axios.get(`https://statsapi.web.nhl.com/api/v1/schedule`)
+  //loop array of games today and check for live status
   const gamesDatesArray = todaysGames.data.dates;
   for (const gameDate of gamesDatesArray) {
     for (const game of gameDate.games) {
@@ -80,4 +80,7 @@ async function findGames () {
       }
     }
   }
+  setTimeout(() => {
+    findGames()
+  }, 10000)
 }

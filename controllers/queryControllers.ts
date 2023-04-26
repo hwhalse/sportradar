@@ -22,10 +22,9 @@ export const QueryControllers = {
         const values = [gameID];
         try {
             const data = await pool.query(queryString, values)
-            console.log(data)
             return data.rows
         } catch(err) {
-            console.log(err)
+            console.log('error in findStatsByGame: ', err)
         }
     },
     findGameStatsByPlayerID: async (args: {game_id: string, player_id: string}): Promise<void | IGameStats[]> => {
@@ -45,7 +44,7 @@ export const QueryControllers = {
             const data = await pool.query(queryString, values);
             return data.rows
         } catch(err) {
-            console.log(err)
+            console.log('error in findGameStatsByPlayerID: ', err)
         }
     },
     findPlayerStatsByID: async (args: {player_id: string}): Promise<void | IGameStats[]> => {
@@ -63,7 +62,7 @@ export const QueryControllers = {
             const data = await pool.query(queryString, values);
             return data.rows
         } catch(err) {
-            console.log(err)
+            console.log('error in findPlayerStatsByID: ', err)
         }
     },
     findPlayerStatsByName: async (args: {name: string}): Promise<void | IGameStats[]> => {
@@ -81,7 +80,7 @@ export const QueryControllers = {
             const data = await pool.query(queryString, values);
             return data.rows
         } catch(err) {
-            console.log(err)
+            console.log('error in findPlayerStatsByName: ', err)
         }
     },
     findPlayerByID: async (args: {player_id: string}): Promise<void | IPlayer> => {
@@ -96,7 +95,7 @@ export const QueryControllers = {
             console.log(data.rows[0])
             return data.rows[0]
         } catch(err) {
-            console.log(err)
+            console.log('error in findPlayerByID: ', err)
         }
     },
     findPlayerByName: async (args: {player_name: string}): Promise<void | IPlayer> => {
@@ -110,7 +109,7 @@ export const QueryControllers = {
             const data = await pool.query(queryString, values);
             return data.rows[0]
         } catch(err) {
-            console.log(err)
+            console.log('error in findPlayerByName: ', err)
         }
     },
     findTeamById: async (args: {team_id: string}): Promise<void | ITeam> => {
@@ -124,7 +123,7 @@ export const QueryControllers = {
             const data = await pool.query(queryString, values);
             return data.rows[0]
         } catch(err) {
-            console.log(err)
+            console.log('error in findTeamById: ', err)
         }
     },
     findTeamByName: async (args: {team_name: string}): Promise<void | ITeam> => {
@@ -138,7 +137,7 @@ export const QueryControllers = {
             const data = await pool.query(queryString, values);
             return data.rows[0]
         } catch(err) {
-            console.log(err)
+            console.log('error in findTeamByName: ', err)
         }
     },
     findScoreByGameID: async (args: {game_id: string}): Promise<void | IGameScores> => {
@@ -152,10 +151,10 @@ export const QueryControllers = {
             const data = await pool.query(queryString, values);
             return data.rows[0]
         } catch(err) {
-            console.log(err)
+            console.log('error in findScoreByGameID: ', err)
         }
     },
-    findAllGames: async (args: any): Promise<void | IGameScores[]> => {
+    findAllGames: async (): Promise<void | IGameScores[]> => {
         const queryString = `
         SELECT g.*, a.name as away_name, h.name as home_name 
         FROM game_scores g 
@@ -167,7 +166,7 @@ export const QueryControllers = {
             const data = await pool.query(queryString);
             return data.rows
         } catch(err) {
-            console.log(err)
+            console.log('error in findAllGames: ', err)
         }
     },
 }

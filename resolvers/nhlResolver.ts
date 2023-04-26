@@ -31,7 +31,7 @@ export const resolvers = {
             return QueryControllers.findScoreByGameID(args)
         },
         getAllGames: async (parent: IGameScores, args: any, context: any): Promise<void | IGameScores[]> => {
-            return QueryControllers.findAllGames(args)
+            return QueryControllers.findAllGames()
         },
     }
 }
