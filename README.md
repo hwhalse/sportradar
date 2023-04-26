@@ -13,22 +13,22 @@ To run the data pipeline:
 
 NOTE: Currently, the child processes are set to run 10 times at 10-second intervals before shutting down. To configure the number of times they run, change the 'count ===' limit in the 'getLiveData' function in child.ts (line 78). You can remove this statement or change the limit number.
 
-Goals:
+    Goals:
 -Create 2 processes: 
   1. continuously monitor schedule to check when games go live, when they do...
   2. send live statistics to database, allowing client queries to database for game, player, and team info
 -Allow offseason (non-live) querying of game statistics
 
-Tech
--TypeScript
--Node.js/Express
--PostgreSQL
--GraphQL
--Apollo Server
--Jest
--Axios
+    Tech
+-TypeScript /n
+-Node.js/Express /n
+-PostgreSQL /n
+-GraphQL /n
+-Apollo Server /n
+-Jest /n
+-Axios /n
 
-Approach
+    Approach
 -Create Node server which calls a function every 10 seconds. The function sends a GET request to the schedule API, which has a list of games for that day.
 -Once a live game is found, the function creates a child process and sends it a message containing the URL of the live game.
 -The child process spins up and, once it receives the URL, calls a function that sends a GET request to that endpoint.
@@ -73,7 +73,4 @@ team_id INT
     teams
 id INT UNIQUE NOT NULL
 name varchar(50) UNIQUE NOT NULL
-
-
-Queries
 
