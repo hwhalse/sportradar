@@ -42,35 +42,39 @@ To run the data pipeline:
 
 Tables
 
-    Name: game_stats
-    id SERIAL PRIMARY KEY <br/>
-    event_index INT <br/>
-    game_id INT <br/>
-    player_id INT <br/>
-    assists INT <br/>
-    goals INT <br/>
-    hits INT <br/>
-    points INT <br/>
-    penalty_minutes INT <br/>
-    opponent_team_id INT <br/>
-    UNIQUE (game_id, event_index) <br/>
-    UNIQUE (game_id, player_id) <br/>
+<h3>game_stats</h3>
 
-    Name: game_scores 
-    game_id INT UNIQUE NOT NULL <br/>
-    away_id INT <br/>
-    home_id INT <br/>
-    away_score INT <br/>
-    home_score INT <br/>
+    id SERIAL PRIMARY KEY 
+    event_index INT 
+    game_id INT 
+    player_id INT 
+    assists INT 
+    goals INT 
+    hits INT 
+    points INT
+    penalty_minutes INT 
+    opponent_team_id INT 
+    UNIQUE (game_id, event_index) 
+    UNIQUE (game_id, player_id) 
 
-    Name: players <br/>
-    id INT UNIQUE NOT NULL <br/>
-    name VARCHAR(50) <br/>
-    position VARCHAR(50) <br/>
-    number VARCHAR(3) <br/>
-    team_id INT <br/>
+<h3>game_scores</h3> 
+    
+    game_id INT UNIQUE NOT NULL 
+    away_id INT 
+    home_id INT 
+    away_score INT 
+    home_score INT 
 
-    Name: teams <br/>
-    id INT UNIQUE NOT NULL <br/>
-    name varchar(50) UNIQUE NOT NULL <br/>
+<h3>players</h3>
+    
+    id INT UNIQUE NOT NULL 
+    name VARCHAR(50) 
+    position VARCHAR(50) 
+    number VARCHAR(3) 
+    team_id INT 
+
+<h3>teams</h3>
+    
+    id INT UNIQUE NOT NULL 
+    name varchar(50) UNIQUE NOT NULL 
 
