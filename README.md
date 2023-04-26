@@ -1,15 +1,17 @@
 <h1>Welcome!</h1>
 
 To run the data pipeline:
-    1. Clone the repo
-    2. Run 'npm install' to install dependencies
-    3. Run 'npm start' to start server
-    4. Run 'npm test' to launch testing suite
-    5. The Apollo server will run at localhost:4000/graphql
-    6. Send a getAllGames query to the server, returning game_id
-    7. Use the game_id to query getGameStatsByGameId
-    8. From there you can grab player IDs to look up player stats
-    9. You can look up players by ID or name, teams by ID or name, game scores by ID, game stats by ID, and game stats by ID and playerID. You can also get game scores by gameID.
+<ol>
+    <li>Clone the repo</li>
+    <li>Run 'npm install' to install dependencies</li>
+    <li>Run 'npm start' to start server</li>
+    <li>Run 'npm test' to launch testing suite</li>
+    <li>The Apollo server will run at localhost:4000/graphql</li>
+    <li>Send a getAllGames query to the server, returning game_id</li>
+    <li>Use the game_id to query getGameStatsByGameId</li>
+    <li>From there you can grab player IDs to look up player stats</li>
+    <li>You can look up players by ID or name, teams by ID or name, game scores by ID, game stats by ID, and game stats by ID and playerID. You can also get game scores by gameID</li>
+</ol>
 
         NOTE: Currently, the child processes are set to run 10 times at 10-second intervals before shutting down. To configure the number of times they run, change the 'count ===' limit in the 'getLiveData' function in child.ts (line 78). You can remove this statement or change the limit number.
 
